@@ -21,6 +21,15 @@ const deleteCookie = (name) => {
   document.cookie = `${name}=;expires=Thu, 01 Jan 1970 00:00:00 UTC;path=/;`;
 };
 
+// Status configuration - Easy to modify and extend
+const STATUS_OPTIONS = [
+  { value: 'pending', label: '⏳ Pending', color: '#ffc107' },
+  { value: 'in-progress', label: '🔄 In Progress', color: '#0dcaf0' },
+  { value: 'done', label: '✅ Done', color: '#198754' },
+  { value: 'cancelled', label: '❌ Cancelled', color: '#6c757d' },
+  { value: 'blocked', label: '🚧 Blocked', color: '#fd7e14' }
+];
+
 const TaskTracker = () => {
   const [tasks, setTasks] = useState([]);
   const [inputValue, setInputValue] = useState("");
@@ -136,9 +145,11 @@ const TaskTracker = () => {
                       onChange={(e) => updateTaskStatus(task.id, e.target.value)}
                       className="status-selector"
                     >
-                      <option value="pending">⏳ Pending</option>
-                      <option value="in-progress">🔄 In Progress</option>
-                      <option value="done">✅ Done</option>
+                      {STATUS_OPTIONS.map((status) => (
+                        <option key={status.value} value={status.value}>
+                          {status.label}
+                        </option>
+                      ))}
                     </select>
                     <div className="date-info">
                       <span className="date-label">Created:</span>

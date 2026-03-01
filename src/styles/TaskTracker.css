@@ -89,7 +89,7 @@
   background-color: #f8f9fa;
 }
 
-/* Status-based styling */
+/* Status-based styling - Dynamic colors */
 .task-item.status-pending {
   border-left: 4px solid #ffc107; /* Yellow for pending */
 }
@@ -100,6 +100,14 @@
 
 .task-item.status-done {
   border-left: 4px solid #198754; /* Green for done */
+}
+
+.task-item.status-cancelled {
+  border-left: 4px solid #6c757d; /* Gray for cancelled */
+}
+
+.task-item.status-blocked {
+  border-left: 4px solid #fd7e14; /* Orange for blocked */
 }
 
 .task-actions {
