@@ -52,23 +52,27 @@ const TaskTracker = () => {
   // Add a new task
   const addTask = () => {
     if (inputValue.trim() !== "") {
+      const now = new Date();
       const newTask = {
         id: Date.now(),
         text: inputValue,
         status: 'pending', // Default status
-        createdAt: new Date().toLocaleString()
+        createdAt: now.toLocaleString(),
+        lastModified: now.toLocaleString()
       };
       setTasks([...tasks, newTask]);
       setInputValue("");
     }
   };
 
-  // Toggle task completion
-  const toggleTask = (id) => {
+  // Update task status
+  const updateTaskStatus = (id, newStatus) => {
+    const now = new Date();
     setTasks(tasks.map(task => 
-      task.id === id ? { ...task, completed: !task.completed } : task
+      task.id === id ? { ...task, status: newStatus, lastModified: now.toLocaleString() } : task
     ));
   };
+
 
   // Delete a task
   const handleDeleteClick = (id) => {
@@ -120,20 +124,28 @@ const TaskTracker = () => {
           ) : (
             <ul className="task-list">
               {tasks.map((task) => (
-                <li key={task.id} className="task-item">
+                <li key={task.id} className={`task-item status-${task.status}`}>
                   <div className="task-content">
-                    <input
-                      type="checkbox"
-                      checked={task.completed}
-                      onChange={() => toggleTask(task.id)}
-                      className="task-checkbox"
-                    />
-                    <span className={`task-text ${task.completed ? 'completed' : ''}`}>
+                    <span className="task-text">
                       {task.text}
                     </span>
                   </div>
-                  <div className="task-info">
-                    <span className="date-text">{task.createdAt}</span>
+                  <div className="task-actions">
+                    <select
+                      value={task.status || 'pending'}
+                      onChange={(e) => updateTaskStatus(task.id, e.target.value)}
+                      className="status-selector"
+                    >
+                      <option value="pending">⏳ Pending</option>
+                      <option value="in-progress">🔄 In Progress</option>
+                      <option value="done">✅ Done</option>
+                    </select>
+                    <div className="date-info">
+                      <span className="date-label">Created:</span>
+                      <span className="date-text">{task.createdAt}</span>
+                      <span className="date-label">Modified:</span>
+                      <span className="date-text">{task.lastModified}</span>
+                    </div>
                     <button
                       onClick={() => handleDeleteClick(task.id)}
                       className="delete-button"
