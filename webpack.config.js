@@ -26,7 +26,7 @@ module.exports = {
  ],
  devServer: {
    static: "./dist",
-   port: 3001,
+   port: 3000,
    historyApiFallback: true,
  },
  resolve: {
