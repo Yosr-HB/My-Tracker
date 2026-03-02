@@ -428,6 +428,120 @@
   cursor: not-allowed;
 }
 
+/* Edit Button */
+.edit-button {
+  padding: 8px 12px;
+  font-size: 0.9rem;
+  background-color: #6f42c1;
+  color: white;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  transition: background-color 0.3s;
+}
+
+.edit-button:hover:not(:disabled) {
+  background-color: #5a32a3;
+}
+
+.edit-button:disabled {
+  background-color: #ccc;
+  cursor: not-allowed;
+}
+
+/* Edit Form Styles */
+.subtask-edit-form {
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  gap: 15px;
+}
+
+.edit-input-section {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.edit-subtask-input {
+  padding: 12px;
+  font-size: 0.9rem;
+  border: 2px solid #6f42c1;
+  border-radius: 6px;
+  outline: none;
+  transition: border-color 0.3s;
+  background-color: #f8f0ff;
+}
+
+.edit-subtask-input:focus {
+  border-color: #6f42c1;
+  box-shadow: 0 0 0 3px rgba(111, 66, 193, 0.2);
+}
+
+.edit-subtask-description-input {
+  padding: 12px;
+  font-size: 0.9rem;
+  border: 2px solid #6f42c1;
+  border-radius: 6px;
+  outline: none;
+  transition: border-color 0.3s;
+  background-color: #f8f0ff;
+  color: #495057;
+}
+
+.edit-subtask-description-input:focus {
+  border-color: #6f42c1;
+  background-color: white;
+  box-shadow: 0 0 0 3px rgba(111, 66, 193, 0.2);
+}
+
+.edit-actions {
+  display: flex;
+  gap: 10px;
+  align-items: center;
+}
+
+.save-edit-button {
+  padding: 10px 20px;
+  font-size: 0.9rem;
+  background-color: #28a745;
+  color: white;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  transition: background-color 0.3s;
+  font-weight: bold;
+}
+
+.save-edit-button:hover:not(:disabled) {
+  background-color: #218838;
+}
+
+.save-edit-button:disabled {
+  background-color: #ccc;
+  cursor: not-allowed;
+}
+
+.cancel-edit-button {
+  padding: 10px 20px;
+  font-size: 0.9rem;
+  background-color: #6c757d;
+  color: white;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  transition: background-color 0.3s;
+}
+
+.cancel-edit-button:hover:not(:disabled) {
+  background-color: #5a6268;
+}
+
+.cancel-edit-button:disabled {
+  background-color: #ccc;
+  cursor: not-allowed;
+}
+
 /* Date Information */
 .date-info {
   padding: 15px 20px;

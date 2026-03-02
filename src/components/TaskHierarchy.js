@@ -20,6 +20,9 @@ const TaskHierarchy = () => {
   const [subTaskDescription, setSubTaskDescription] = useState(""); // Add description state
   const [subTaskInputs, setSubTaskInputs] = useState({}); // Individual subtask inputs per main task
   const [subTaskDescriptions, setSubTaskDescriptions] = useState({}); // Individual descriptions per main task
+  const [editingSubTask, setEditingSubTask] = useState(null); // Track which subtask is being edited
+  const [editingText, setEditingText] = useState(""); // Text for editing
+  const [editingDescription, setEditingDescription] = useState(""); // Description for editing
   const [selectedMainTask, setSelectedMainTask] = useState(null);
   const [showModal, setShowModal] = useState(false);
   const [taskToDelete, setTaskToDelete] = useState(null);
@@ -241,6 +244,66 @@ const TaskHierarchy = () => {
     setTaskToDelete(null);
   };
 
+  // Start editing a subtask
+  const startEditSubTask = (subtask) => {
+    setEditingSubTask(subtask.id);
+    setEditingText(subtask.text);
+    setEditingDescription(subtask.description || "");
+  };
+
+  // Save edited subtask
+  const saveEditSubTask = async (mainTaskId, subTaskId) => {
+    if (editingText.trim() !== "") {
+      setLoading(true);
+      setError(null);
+      try {
+        const mainTask = tasks.find(task => task.id === mainTaskId);
+        if (!mainTask) {
+          setError('Main task not found');
+          return;
+        }
+
+        const updatedSubtasks = mainTask.subtasks.map(subtask => 
+          subtask.id === subTaskId 
+            ? { 
+                ...subtask, 
+                text: editingText,
+                description: editingDescription,
+                lastModified: new Date().toLocaleString() 
+              }
+            : subtask
+        );
+
+        const updatedTask = {
+          ...mainTask,
+          subtasks: updatedSubtasks
+        };
+
+        const response = await taskApi.updateTask(mainTaskId, updatedTask);
+        setTasks(tasks.map(task => 
+          task.id === mainTaskId ? response : task
+        ));
+        
+        // Exit edit mode
+        setEditingSubTask(null);
+        setEditingText("");
+        setEditingDescription("");
+      } catch (err) {
+        setError('Failed to update subtask. Please check if the backend is running.');
+        console.error('Error updating subtask:', err);
+      } finally {
+        setLoading(false);
+      }
+    }
+  };
+
+  // Cancel editing
+  const cancelEditSubTask = () => {
+    setEditingSubTask(null);
+    setEditingText("");
+    setEditingDescription("");
+  };
+
   // Calculate task statistics
   const getTaskStats = () => {
     let totalMainTasks = 0;
@@ -436,33 +499,83 @@ const TaskHierarchy = () => {
                       <ul className="subtask-items">
                         {mainTask.subtasks.map((subtask) => (
                           <li key={subtask.id} className={`subtask-item status-${subtask.status}`}>
-                            <div className="subtask-content">
-                              <span className="subtask-text">{subtask.text}</span>
-                              {subtask.description && (
-                                <span className="subtask-description">{subtask.description}</span>
-                              )}
-                            </div>
-                            <div className="subtask-actions">
-                              <select
-                                value={subtask.status || 'pending'}
-                                onChange={(e) => updateSubTaskStatus(mainTask.id, subtask.id, e.target.value)}
-                                className="status-selector"
-                                disabled={loading}
-                              >
-                                {STATUS_OPTIONS.map((status) => (
-                                  <option key={status.value} value={status.value}>
-                                    {status.label}
-                                  </option>
-                                ))}
-                              </select>
-                              <button
-                                onClick={() => handleDeleteClick(subtask, true, mainTask.id)}
-                                className="delete-button"
-                                disabled={loading}
-                              >
-                                Delete
-                              </button>
-                            </div>
+                            {editingSubTask === subtask.id ? (
+                              // Edit Mode
+                              <div className="subtask-edit-form">
+                                <div className="edit-input-section">
+                                  <input
+                                    type="text"
+                                    value={editingText}
+                                    onChange={(e) => setEditingText(e.target.value)}
+                                    placeholder="Edit subtask text..."
+                                    className="edit-subtask-input"
+                                    disabled={loading}
+                                  />
+                                  <input
+                                    type="text"
+                                    value={editingDescription}
+                                    onChange={(e) => setEditingDescription(e.target.value)}
+                                    placeholder="Edit description (optional)..."
+                                    className="edit-subtask-description-input"
+                                    disabled={loading}
+                                  />
+                                </div>
+                                <div className="edit-actions">
+                                  <button
+                                    onClick={() => saveEditSubTask(mainTask.id, subtask.id)}
+                                    className="save-edit-button"
+                                    disabled={loading}
+                                  >
+                                    {loading ? 'Saving...' : 'Save'}
+                                  </button>
+                                  <button
+                                    onClick={cancelEditSubTask}
+                                    className="cancel-edit-button"
+                                    disabled={loading}
+                                  >
+                                    Cancel
+                                  </button>
+                                </div>
+                              </div>
+                            ) : (
+                              // View Mode
+                              <>
+                                <div className="subtask-content">
+                                  <span className="subtask-text">{subtask.text}</span>
+                                  {subtask.description && (
+                                    <span className="subtask-description">{subtask.description}</span>
+                                  )}
+                                </div>
+                                <div className="subtask-actions">
+                                  <select
+                                    value={subtask.status || 'pending'}
+                                    onChange={(e) => updateSubTaskStatus(mainTask.id, subtask.id, e.target.value)}
+                                    className="status-selector"
+                                    disabled={loading}
+                                  >
+                                    {STATUS_OPTIONS.map((status) => (
+                                      <option key={status.value} value={status.value}>
+                                        {status.label}
+                                      </option>
+                                    ))}
+                                  </select>
+                                  <button
+                                    onClick={() => startEditSubTask(subtask)}
+                                    className="edit-button"
+                                    disabled={loading}
+                                  >
+                                    Edit
+                                  </button>
+                                  <button
+                                    onClick={() => handleDeleteClick(subtask, true, mainTask.id)}
+                                    className="delete-button"
+                                    disabled={loading}
+                                  >
+                                    Delete
+                                  </button>
+                                </div>
+                              </>
+                            )}
                           </li>
                         ))}
                       </ul>
